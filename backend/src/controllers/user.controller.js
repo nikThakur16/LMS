@@ -117,7 +117,7 @@ export const getUser = async(req,res)=>{
     try {
         const userId = req.user._id
 
-        const user = await User.findById(userId)
+        const user = await User.findById(userId).select('-password')
 
         if(!user){
             return res.status(401).json({
@@ -126,7 +126,7 @@ export const getUser = async(req,res)=>{
         }
 
 
-        return res.status(201).json(user)
+        return res.status(200).json(user)
     } catch (error) {
         console.log(`error from get User, ${error}`)
     }
@@ -135,7 +135,7 @@ export const getUser = async(req,res)=>{
 
 export const logout=async(req,res)=>{
     try {
-        return res.cookie("token","").status(201).json({
+        return res.clearCookie("token", { httpOnly:true, secure:true, sameSite:"none" }).status(200).json({
             message:"User logged out"
         })
     } catch (error) {

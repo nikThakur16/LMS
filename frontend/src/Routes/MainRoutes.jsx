@@ -3,7 +3,7 @@ import Register from '@/Pages/Auth/Register'
 import Home from '@/Pages/User/Home'
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { ProtectedRoutes } from './ProtectedRoute'
+import { AdminProtectedRoutes, ProtectedRoutes } from './ProtectedRoute'
 import SingleCourse from '@/Pages/User/SingleCourse'
 import YourCourse from '@/Pages/User/YourCourse'
 import SinglePurchasedCourse from '@/Pages/User/SinglePurchasedCourse'
@@ -14,75 +14,84 @@ import CreateModule from '@/Pages/Admin/CreateModule'
 import Quiz from '@/Pages/User/Quiz'
 import Cancel from '@/Pages/Admin/Cancel'
 import PaymenSuccess from '@/Pages/Admin/PaymenSuccess'
+import Profile from '@/Pages/User/Profile'
 
 const MainRoutes = () => {
   return (
-   <Routes>
+    <Routes>
+      <Route path='/' element={
+        <ProtectedRoutes>
+          <Home />
+        </ProtectedRoutes>
+      } />
 
-    <Route path='/' element={
+      <Route path='/profile' element={
         <ProtectedRoutes>
-            <Home/>
+          <Profile />
         </ProtectedRoutes>
-    }/>
-    <Route path='/cancel' element={
-        <ProtectedRoutes>
-            <Cancel/>
-        </ProtectedRoutes>
-    }/>
-    <Route path='/purchase' element={
-        <ProtectedRoutes>
-            <PaymenSuccess/>
-        </ProtectedRoutes>
-    }/>
-    <Route path='/singleCourse/:id' element={
-        <ProtectedRoutes>
-            <SingleCourse/>
-        </ProtectedRoutes>
-    }/>
-    <Route path='/YourCourse' element={
-        <ProtectedRoutes>
-            <YourCourse/>
-        </ProtectedRoutes>
-    }/>
-    <Route path='/YourCourse/:id' element={
-        <ProtectedRoutes>
-            <SinglePurchasedCourse/>
-        </ProtectedRoutes>
-    }/>
-    <Route path='/quiz/:id' element={
-        <ProtectedRoutes>
-            <Quiz/>
-        </ProtectedRoutes>
-    }/>
+      } />
 
-    <Route path='/dashboard' element={
+      <Route path='/cancel' element={
         <ProtectedRoutes>
-
-            <Dashboard/>
+          <Cancel />
         </ProtectedRoutes>
-        } >
-      
-      <Route index  element={
+      } />
+
+      <Route path='/purchase' element={
         <ProtectedRoutes>
-            
-            <DashboardAnalytics/>
+          <PaymenSuccess />
         </ProtectedRoutes>
-        }/>
-      <Route path='dashboardProduct' element={
-          <ProtectedRoutes>
-            <DasbhoardProducts/>
+      } />
 
+      <Route path='/singleCourse/:id' element={
+        <ProtectedRoutes>
+          <SingleCourse />
         </ProtectedRoutes>
-        }/>
+      } />
+
+      <Route path='/YourCourse' element={
+        <ProtectedRoutes>
+          <YourCourse />
+        </ProtectedRoutes>
+      } />
+
+      <Route path='/YourCourse/:id' element={
+        <ProtectedRoutes>
+          <SinglePurchasedCourse />
+        </ProtectedRoutes>
+      } />
+
+      <Route path='/quiz/:id' element={
+        <ProtectedRoutes>
+          <Quiz />
+        </ProtectedRoutes>
+      } />
+
+      <Route path='/dashboard' element={
+        <AdminProtectedRoutes>
+          <Dashboard />
+        </AdminProtectedRoutes>
+      }>
+        <Route index element={
+          <AdminProtectedRoutes>
+            <DashboardAnalytics />
+          </AdminProtectedRoutes>
+        } />
+        <Route path='dashboardProduct' element={
+          <AdminProtectedRoutes>
+            <DasbhoardProducts />
+          </AdminProtectedRoutes>
+        } />
         <Route path='CourseModule/:id' element={
-            <ProtectedRoutes>
-                <CreateModule/>
-            </ProtectedRoutes>
-        }/>
-    </Route>
-    <Route path='/login' element={<Login/>}/>
-    <Route path='/register' element={<Register/>}/>
-   </Routes>
+          <AdminProtectedRoutes>
+            <CreateModule />
+          </AdminProtectedRoutes>
+        } />
+      </Route>
+
+      <Route path='/login' element={<Login />} />
+      <Route path='/register' element={<Register />} />
+    </Routes>
   )
 }
 
