@@ -16,6 +16,6 @@ const storage = new CloudinaryStorage({
 export const videoUpload = multer({
     storage:storage,
     limits:{
-        fileSize:1024*1024*500 // this will upload 500gb file
+        fileSize:1024*1024*500 // 500MB
     }
 })

@@ -55,7 +55,7 @@ export const getCourse = async(req, res)=>{
         
         const {search}  = req.query;
 
-        if(!search || !search.trim()===""){
+        if(!search || search.trim()===""){
             const allCourses = await Course.find()
 
             return res.status(201).json({

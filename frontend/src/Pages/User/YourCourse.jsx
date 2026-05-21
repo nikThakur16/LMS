@@ -8,7 +8,7 @@ const YourCourse = () => {
   const navigate = useNavigate()
 
   const navigateSinglePurchaseCourse = (id) => {
-    navigate(id)
+    navigate(`/YourCourse/${id}`)
   }
 
   if (isLoading) {
