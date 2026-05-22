@@ -1,32 +1,43 @@
-// Home.jsx - Fixed logic
 import CourseSection from '@/components/CourseSection'
 import SearchResult from '@/components/SearchResult'
 import React, { useState } from 'react'
 
 const Home = () => {
-  const [SearchInput, setSearchInput] = useState('')
-  const [ActiveSearch, setActiveSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [activeSearch, setActiveSearch] = useState('')
+  const [activeCategory, setActiveCategory] = useState('All')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    setActiveSearch(SearchInput)
+    setActiveSearch(searchInput)
+    setActiveCategory('All')
+  }
+
+  const handleCategorySelect = (category) => {
+    setActiveCategory(category)
+    const query = category === 'All' ? '' : category
+    setSearchInput(query)
+    setActiveSearch(query)
   }
 
   const resetFilter = () => {
-    setSearchInput("")
-    setActiveSearch("")
+    setSearchInput('')
+    setActiveSearch('')
+    setActiveCategory('All')
   }
 
   return (
-    <div className='min-h-screen bg-slate-50'>
+    <div className='min-h-screen' style={{ background: 'var(--app-bg)' }}>
       <SearchResult
-        SearchInput={SearchInput}
+        searchInput={searchInput}
         setSearchInput={setSearchInput}
         handleSubmit={handleSubmit}
         onReset={resetFilter}
-        hasActiveSearch={!!ActiveSearch}  // ✅ Fixed: ActiveSearch not SearchInput
+        hasActiveSearch={!!activeSearch}
+        activeCategory={activeCategory}
+        onCategorySelect={handleCategorySelect}
       />
-      <CourseSection ActiveSearch={ActiveSearch} />
+      <CourseSection activeSearch={activeSearch} activeCategory={activeCategory} />
     </div>
   )
 }

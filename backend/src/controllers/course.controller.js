@@ -9,7 +9,13 @@ const model = genAI.getGenerativeModel({model:'gemini-2.5-flash'})
 
 export const createCourse =async(req , res)=>{
     try {
-        const {title, description, amount} = req.body;
+        const { title, description, amount, level, language, totalDuration } = req.body
+        const whatYouLearn = req.body.whatYouLearn
+          ? (Array.isArray(req.body.whatYouLearn) ? req.body.whatYouLearn : [req.body.whatYouLearn]).filter(Boolean)
+          : []
+        const requirements = req.body.requirements
+          ? (Array.isArray(req.body.requirements) ? req.body.requirements : [req.body.requirements]).filter(Boolean)
+          : []
         const thumbnail = req.file
 
         if(!title || !description || !amount){
@@ -29,11 +35,16 @@ export const createCourse =async(req , res)=>{
         imageUrl = uploadRes.secure_url
 
         const newCourse = new Course({
-            userId:req.user._id,
+            userId: req.user._id,
             title,
             description,
-            thumbnail:imageUrl,
-            amount
+            thumbnail: imageUrl,
+            amount,
+            whatYouLearn,
+            requirements,
+            level:    level    || 'Beginner',
+            language: language || 'English',
+            totalDuration: totalDuration || '',
         })
 
         await newCourse.save()

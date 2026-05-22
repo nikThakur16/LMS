@@ -41,21 +41,47 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ── Dark mode (default) ───────────────────────────────────── */
 :root {
   --radius: 0.75rem;
 
-  /* Dark zinc palette */
+  /* App-specific palette */
+  --app-bg:       #09090b;
+  --app-bg-2:     #0d0d10;
+  --app-surface:  #111113;
+  --app-surface-2:#18181b;
+  --app-border:   rgba(255,255,255,0.07);
+  --app-border-2: rgba(255,255,255,0.1);
+  --app-text:     #fafafa;
+  --app-text-2:   #a1a1aa;
+  --app-text-3:   #71717a;
+  --app-text-4:   #52525b;
+  --app-glass:    rgba(255,255,255,0.04);
+  --app-glass-border: rgba(255,255,255,0.08);
+  --app-hover:    rgba(255,255,255,0.05);
+  --app-scrollbar-track: #09090b;
+  --app-scrollbar-thumb: #3f3f46;
+  --app-scrollbar-thumb-hover: #52525b;
+  --app-progress-bg: #27272a;
+  --app-star-empty: #3f3f46;
+  --app-mesh-bg: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(99,102,241,0.12) 0%, transparent 60%),
+                 radial-gradient(ellipse 60% 60% at 80% 80%, rgba(139,92,246,0.08) 0%, transparent 50%),
+                 #09090b;
+  --app-gradient-text: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #818cf8 100%);
+
+  /* Indigo primary (same in both themes) */
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --primary-hover: #818cf8;
+  --ring: #6366f1;
+
+  /* shadcn/ui tokens */
   --background: #09090b;
   --foreground: #fafafa;
   --card: #111113;
   --card-foreground: #fafafa;
   --popover: #18181b;
   --popover-foreground: #fafafa;
-
-  /* Indigo primary */
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-
   --secondary: #18181b;
   --secondary-foreground: #a1a1aa;
   --muted: #27272a;
@@ -65,16 +91,11 @@
   --destructive: #ef4444;
   --border: rgba(255,255,255,0.07);
   --input: #27272a;
-  --ring: #6366f1;
-
-  /* Charts */
   --chart-1: #6366f1;
   --chart-2: #8b5cf6;
   --chart-3: #06b6d4;
   --chart-4: #f59e0b;
   --chart-5: #10b981;
-
-  /* Sidebar */
   --sidebar: #09090b;
   --sidebar-foreground: #fafafa;
   --sidebar-primary: #6366f1;
@@ -85,56 +106,107 @@
   --sidebar-ring: #6366f1;
 }
 
+/* ── Light mode overrides ──────────────────────────────────── */
+html.light {
+  --app-bg:       #f8fafc;
+  --app-bg-2:     #f1f5f9;
+  --app-surface:  #ffffff;
+  --app-surface-2:#f1f5f9;
+  --app-border:   rgba(0,0,0,0.08);
+  --app-border-2: rgba(0,0,0,0.12);
+  --app-text:     #0f172a;
+  --app-text-2:   #475569;
+  --app-text-3:   #64748b;
+  --app-text-4:   #94a3b8;
+  --app-glass:    rgba(255,255,255,0.7);
+  --app-glass-border: rgba(0,0,0,0.08);
+  --app-hover:    rgba(0,0,0,0.04);
+  --app-scrollbar-track: #f1f5f9;
+  --app-scrollbar-thumb: #cbd5e1;
+  --app-scrollbar-thumb-hover: #94a3b8;
+  --app-progress-bg: #e2e8f0;
+  --app-star-empty: #cbd5e1;
+  --app-mesh-bg: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(99,102,241,0.08) 0%, transparent 60%),
+                 radial-gradient(ellipse 60% 60% at 80% 80%, rgba(139,92,246,0.05) 0%, transparent 50%),
+                 #f8fafc;
+  --app-gradient-text: linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #6366f1 100%);
+
+  /* shadcn/ui tokens for light */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #475569;
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --accent: #ede9fe;
+  --accent-foreground: #4338ca;
+  --border: rgba(0,0,0,0.08);
+  --input: #e2e8f0;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-accent: #ede9fe;
+  --sidebar-accent-foreground: #4338ca;
+  --sidebar-border: rgba(0,0,0,0.08);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
     box-sizing: border-box;
   }
   body {
-    background-color: #09090b;
-    color: #fafafa;
+    background-color: var(--app-bg);
+    color: var(--app-text);
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   ::selection {
     background: rgba(99,102,241,0.3);
-    color: #fafafa;
+    color: var(--app-text);
   }
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #09090b;
+    background: var(--app-scrollbar-track);
   }
   ::-webkit-scrollbar-thumb {
-    background: #3f3f46;
+    background: var(--app-scrollbar-thumb);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #52525b;
+    background: var(--app-scrollbar-thumb-hover);
   }
 }
 
 /* ── Utility classes ──────────────────────────────────────── */
 .surface {
-  background: #111113;
-  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .surface-lg {
-  background: #111113;
-  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 16px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .glass {
-  background: rgba(255,255,255,0.04);
+  background: var(--app-glass);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--app-glass-border);
+  transition: background-color 0.2s ease;
 }
 
 .glow-indigo {
@@ -146,7 +218,7 @@
 }
 
 .btn-primary {
-  background: #6366f1;
+  background: var(--primary);
   color: #fff;
   font-weight: 600;
   border-radius: 10px;
@@ -154,7 +226,7 @@
   border: 1px solid rgba(99,102,241,0.5);
 }
 .btn-primary:hover {
-  background: #818cf8;
+  background: var(--primary-hover);
   box-shadow: 0 0 20px rgba(99,102,241,0.35);
   transform: translateY(-1px);
 }
@@ -169,30 +241,30 @@
 
 .btn-ghost {
   background: transparent;
-  color: #a1a1aa;
-  border: 1px solid rgba(255,255,255,0.07);
+  color: var(--app-text-2);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
   transition: all 0.15s ease;
 }
 .btn-ghost:hover {
-  background: rgba(255,255,255,0.05);
-  color: #fafafa;
-  border-color: rgba(255,255,255,0.15);
+  background: var(--app-hover);
+  color: var(--app-text);
+  border-color: var(--app-border-2);
 }
 
 .input-dark {
-  background: #18181b;
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #fafafa;
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border-2);
+  color: var(--app-text);
   border-radius: 10px;
   transition: all 0.15s ease;
   outline: none;
 }
 .input-dark::placeholder {
-  color: #52525b;
+  color: var(--app-text-4);
 }
 .input-dark:focus {
-  border-color: #6366f1;
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
 }
 
@@ -207,7 +279,7 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #818cf8 100%);
+  background: var(--app-gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -215,9 +287,23 @@
 
 /* Animated mesh gradient background */
 .mesh-bg {
-  background: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(99,102,241,0.12) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 60% at 80% 80%, rgba(139,92,246,0.08) 0%, transparent 50%),
-              #09090b;
+  background: var(--app-mesh-bg);
+  transition: background 0.2s ease;
+}
+
+/* Hero gradient for auth pages and hero sections */
+.hero-gradient {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4c1d95 60%, #1e1b4b 100%);
+}
+
+/* Glassmorphic card */
+.card-glass {
+  background: var(--app-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--app-glass-border);
+  border-radius: 16px;
+  transition: all 0.2s ease;
 }
 
 /* Card hover glow */
@@ -233,7 +319,7 @@
 /* Progress bar */
 .progress-bar {
   height: 4px;
-  background: #27272a;
+  background: var(--app-progress-bg);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -246,4 +332,11 @@
 
 /* Star rating */
 .star-filled { color: #f59e0b; fill: #f59e0b; }
-.star-empty  { color: #3f3f46; fill: #3f3f46; }
+.star-empty  { color: var(--app-star-empty); fill: var(--app-star-empty); }
+
+/* Level badges */
+.badge-level-1 { background: rgba(113,113,122,0.15); color: #a1a1aa; border: 1px solid rgba(113,113,122,0.25); border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+.badge-level-2 { background: rgba(6,182,212,0.15);   color: #22d3ee; border: 1px solid rgba(6,182,212,0.25);   border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+.badge-level-3 { background: rgba(99,102,241,0.15);  color: #818cf8; border: 1px solid rgba(99,102,241,0.25);  border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+.badge-level-4 { background: rgba(139,92,246,0.15);  color: #a78bfa; border: 1px solid rgba(139,92,246,0.25);  border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }
+.badge-level-5 { background: rgba(245,158,11,0.15);  color: #fbbf24; border: 1px solid rgba(245,158,11,0.25);  border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; }

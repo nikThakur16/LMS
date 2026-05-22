@@ -38,17 +38,17 @@ const YourCourse = () => {
 
   if (isLoading) {
     return (
-      <div className='min-h-screen bg-[#09090b] p-8'>
+      <div className='min-h-screen bg-transparent p-8'>
         <div className='max-w-6xl mx-auto'>
           <div className='h-7 w-48 bg-zinc-800 rounded-lg animate-pulse mb-8' />
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
             {[1,2,3,4].map((i) => (
               <div key={i} className='surface-lg overflow-hidden animate-pulse'>
-                <div className='h-44 bg-zinc-800' />
+                <div className='h-44' style={{ background: 'var(--app-surface-2)' }} />
                 <div className='p-4 space-y-3'>
-                  <div className='h-4 bg-zinc-800 rounded-lg w-3/4' />
-                  <div className='h-3 bg-zinc-800/50 rounded-lg' />
-                  <div className='h-8 bg-zinc-800 rounded-lg mt-4' />
+                  <div className='h-4 rounded-lg w-3/4' style={{ background: 'var(--app-surface-2)' }} />
+                  <div className='h-3 rounded-lg' style={{ background: 'var(--app-surface-2)', opacity: 0.6 }} />
+                  <div className='h-8 rounded-lg mt-4' style={{ background: 'var(--app-surface-2)' }} />
                 </div>
               </div>
             ))}
@@ -61,7 +61,7 @@ const YourCourse = () => {
   const courses = data?.purchasedCourse || []
 
   return (
-    <div className='min-h-screen bg-[#09090b] px-6 py-10'>
+    <div className='min-h-screen bg-transparent px-6 py-10'>
       <div className='max-w-6xl mx-auto'>
         {/* Header */}
         <div className='mb-8'>
@@ -97,7 +97,7 @@ const YourCourse = () => {
                 className='surface-lg overflow-hidden cursor-pointer card-hover group'
               >
                 {/* Thumbnail */}
-                <div className='relative h-44 bg-zinc-800 overflow-hidden'>
+                <div className='relative h-44 overflow-hidden' style={{ background: 'var(--app-surface-2)' }}>
                   <img
                     className='h-full w-full object-cover group-hover:scale-105 transition-transform duration-500'
                     src={item.thumbnail}

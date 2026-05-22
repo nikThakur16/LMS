@@ -145,6 +145,40 @@ export const logout=async(req,res)=>{
 
 
 
+export const addToWishlist = async (req, res) => {
+    try {
+        const { courseId } = req.body
+        if (!courseId) return res.status(400).json({ message: 'courseId required' })
+        await User.findByIdAndUpdate(req.user._id, { $addToSet: { wishlist: courseId } })
+        return res.status(200).json({ success: true })
+    } catch (error) {
+        console.log('addToWishlist error', error)
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const removeFromWishlist = async (req, res) => {
+    try {
+        const { courseId } = req.body
+        if (!courseId) return res.status(400).json({ message: 'courseId required' })
+        await User.findByIdAndUpdate(req.user._id, { $pull: { wishlist: courseId } })
+        return res.status(200).json({ success: true })
+    } catch (error) {
+        console.log('removeFromWishlist error', error)
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const getWishlist = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate('wishlist').select('wishlist')
+        return res.status(200).json({ courses: user?.wishlist || [] })
+    } catch (error) {
+        console.log('getWishlist error', error)
+        return res.status(500).json({ message: error.message })
+    }
+}
+
 export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;

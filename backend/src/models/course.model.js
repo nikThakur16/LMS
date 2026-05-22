@@ -28,7 +28,12 @@ const courseSchema= new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:"Modules"
         }
-    ]
+    ],
+    whatYouLearn: [{ type: String }],
+    requirements:  [{ type: String }],
+    level:    { type: String, default: 'Beginner' },
+    language: { type: String, default: 'English' },
+    totalDuration: { type: String, default: '' }
 },{timestamps:true})
 
 

@@ -27,7 +27,11 @@ const userSchema  = new mongoose.Schema({
             
         }
     ],
-    profilePhoto:{type:String}
+    profilePhoto:{type:String},
+    wishlist:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Course'
+    }]
 },{timestamps:true})
 
 

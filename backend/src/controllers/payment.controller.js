@@ -99,18 +99,24 @@ export const checkoutSuccess=async(req,res)=>{
             const userId = session.metadata.userId
 
 
-            const newOrder =  new Order({
-                user:userId,
-                course:courseId,
-                totalAmount:session.amount_total/100,
-                stripeSessionId:sessionId
-            })
-
-            await newOrder.save()
+            let newOrder
+            try {
+                newOrder = await Order.create({
+                    user:userId,
+                    course:courseId,
+                    totalAmount:session.amount_total/100,
+                    stripeSessionId:sessionId
+                })
+            } catch (dupErr) {
+                if (dupErr.code === 11000) {
+                    return res.status(201).json({ message:"Order already created" })
+                }
+                throw dupErr
+            }
 
             await User.findByIdAndUpdate(
                 userId,
-                { $push: { purchasedCourse: courseId } }
+                { $addToSet: { purchasedCourse: courseId } }
             )
 
             return res.status(201).json({

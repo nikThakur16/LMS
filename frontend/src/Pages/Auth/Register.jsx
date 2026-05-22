@@ -20,9 +20,9 @@ const Register = () => {
   ]
 
   return (
-    <div className='min-h-screen flex bg-[#09090b]'>
-      {/* Left panel */}
-      <div className='hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col justify-between p-14'>
+    <div className='min-h-screen flex' style={{ background: 'var(--app-bg)' }}>
+      {/* Left panel — always dark hero */}
+      <div className='hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col justify-between p-14 bg-[#09090b]'>
         <div className='absolute inset-0 mesh-bg' />
         <div className='absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent' />
 
@@ -45,7 +45,6 @@ const Register = () => {
           <p className='text-zinc-400 text-lg leading-relaxed max-w-md mb-10'>
             Everything you need to level up your skills, in one beautifully designed platform.
           </p>
-
           <div className='space-y-3'>
             {perks.map((perk) => (
               <div key={perk} className='flex items-center gap-3'>
@@ -64,27 +63,29 @@ const Register = () => {
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className='flex-1 flex items-center justify-center px-6 py-12 relative'>
-        <div className='absolute inset-0 bg-zinc-950/50' />
-        <div className='relative w-full max-w-sm'>
+      {/* Right panel — theme-aware */}
+      <div className='flex-1 flex items-center justify-center px-6 py-12'>
+        <div className='w-full max-w-sm'>
           <div className='flex items-center gap-2.5 mb-10 lg:hidden'>
             <div className='w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center'>
               <GraduationCap className='w-4 h-4 text-white' />
             </div>
-            <span className='text-base font-bold text-white'>EduSmart</span>
+            <span className='text-base font-bold' style={{ color: 'var(--app-text)' }}>EduSmart</span>
           </div>
 
-          <h1 className='text-2xl font-black text-white mb-1 tracking-tight'>Create your account</h1>
-          <p className='text-zinc-500 text-sm mb-8'>Free to join, start learning today</p>
+          <h1 className='text-2xl font-black mb-1 tracking-tight' style={{ color: 'var(--app-text)' }}>
+            Create your account
+          </h1>
+          <p className='text-sm mb-8' style={{ color: 'var(--app-text-3)' }}>Free to join, start learning today</p>
 
           <form onSubmit={handleSubmit((d) => mutate(d))} className='space-y-4'>
             <div>
-              <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>
+              <label className='block text-xs font-semibold mb-1.5 uppercase tracking-wider'
+                style={{ color: 'var(--app-text-2)' }}>
                 Full Name
               </label>
               <div className='relative'>
-                <User className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600' />
+                <User className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4' style={{ color: 'var(--app-text-4)' }} />
                 <input
                   type='text'
                   placeholder='John Doe'
@@ -96,11 +97,12 @@ const Register = () => {
             </div>
 
             <div>
-              <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>
+              <label className='block text-xs font-semibold mb-1.5 uppercase tracking-wider'
+                style={{ color: 'var(--app-text-2)' }}>
                 Email
               </label>
               <div className='relative'>
-                <Mail className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600' />
+                <Mail className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4' style={{ color: 'var(--app-text-4)' }} />
                 <input
                   type='email'
                   placeholder='you@example.com'
@@ -112,11 +114,12 @@ const Register = () => {
             </div>
 
             <div>
-              <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>
+              <label className='block text-xs font-semibold mb-1.5 uppercase tracking-wider'
+                style={{ color: 'var(--app-text-2)' }}>
                 Password
               </label>
               <div className='relative'>
-                <Lock className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600' />
+                <Lock className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4' style={{ color: 'var(--app-text-4)' }} />
                 <input
                   type={showPass ? 'text' : 'password'}
                   placeholder='Min. 6 characters'
@@ -126,7 +129,8 @@ const Register = () => {
                 <button
                   type='button'
                   onClick={() => setShowPass(!showPass)}
-                  className='absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-300 transition-colors'
+                  className='absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors'
+                  style={{ color: 'var(--app-text-4)' }}
                 >
                   {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -143,7 +147,7 @@ const Register = () => {
             </button>
           </form>
 
-          <p className='text-sm text-center text-zinc-600 mt-6'>
+          <p className='text-sm text-center mt-6' style={{ color: 'var(--app-text-4)' }}>
             Already have an account?{' '}
             <Link to='/login' className='text-indigo-400 font-semibold hover:text-indigo-300 transition-colors'>
               Sign in

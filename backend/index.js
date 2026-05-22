@@ -12,6 +12,7 @@ import analyticRoute from './src/routes/analytic.route.js'
 import progressRoute from './src/routes/progress.route.js'
 import reviewRoute from './src/routes/review.route.js'
 import noteRoute from './src/routes/note.route.js'
+import streakRoute from './src/routes/streak.route.js'
 import cors from 'cors'
 
 const app = express()
@@ -36,6 +37,7 @@ app.use('/api/analytic', analyticRoute)
 app.use('/api/progress', progressRoute)
 app.use('/api/review', reviewRoute)
 app.use('/api/note', noteRoute)
+app.use('/api/streak', streakRoute)
 
 
 

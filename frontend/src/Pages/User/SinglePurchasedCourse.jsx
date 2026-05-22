@@ -1,5 +1,5 @@
 import { useGetPurchaseCourse } from '@/hooks/course.hook'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useModuleStores } from '@/Store/module.store'
 import { useGetComment } from '@/hooks/module.hook'
@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { useCreateComment } from '@/hooks/comment.hook'
 import { useCreateQuiz } from '@/hooks/quiz.hook'
 import { useMarkComplete, useGetProgress } from '@/hooks/progress.hook'
+import { useRecordActivity } from '@/hooks/streak.hook'
 import { useSaveNote, useGetNote } from '@/hooks/note.hook'
 import {
   MessageCircle, Send, PlayCircle, FileQuestion, Trophy,
@@ -16,6 +17,8 @@ import {
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
+const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2]
+
 const SinglePurchasedCourse = () => {
   const { register, handleSubmit, reset } = useForm()
   const { register: noteRegister, handleSubmit: noteSubmit, setValue } = useForm()
@@ -23,12 +26,15 @@ const SinglePurchasedCourse = () => {
   const { setModule, module } = useModuleStores()
   const { id } = useParams()
   const [activeTab, setActiveTab] = useState('discussion')
+  const [playbackSpeed, setPlaybackSpeed] = useState(1)
+  const videoRef = useRef(null)
 
   const { data } = useGetPurchaseCourse(id)
   const { data: commentsData } = useGetComment(module?._id)
   const { mutate: createQuiz } = useCreateQuiz()
   const { mutate: postComment } = useCreateComment()
   const { mutate: markComplete } = useMarkComplete()
+  const { mutate: recordActivity } = useRecordActivity()
   const { data: progressData } = useGetProgress(id)
   const { data: noteData } = useGetNote(module?._id)
   const { mutate: saveNote } = useSaveNote()
@@ -43,6 +49,24 @@ const SinglePurchasedCourse = () => {
   useEffect(() => {
     setValue('content', noteData?.content || '')
   }, [noteData?.content, module?._id, setValue])
+
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = playbackSpeed
+  }, [playbackSpeed])
+
+  useEffect(() => {
+    const handler = (e) => {
+      const v = videoRef.current
+      if (!v) return
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.code === 'Space') { e.preventDefault(); v.paused ? v.play() : v.pause() }
+      if (e.code === 'ArrowRight') v.currentTime = Math.min(v.duration || 0, v.currentTime + 10)
+      if (e.code === 'ArrowLeft')  v.currentTime = Math.max(0, v.currentTime - 10)
+      if (e.code === 'KeyF') v.requestFullscreen?.()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   const createQuizHandler = (mod) => {
     createQuiz(
@@ -62,7 +86,12 @@ const SinglePurchasedCourse = () => {
     if (!module?._id) return
     markComplete(
       { moduleId: module._id, courseId: id },
-      { onSuccess: () => toast.success('Module marked complete!') }
+      {
+        onSuccess: () => {
+          toast.success('Module marked complete! +10 XP')
+          recordActivity()
+        }
+      }
     )
   }
 
@@ -83,13 +112,29 @@ const SinglePurchasedCourse = () => {
         {/* Video player */}
         <div className='relative bg-black flex-shrink-0' style={{ height: '55%' }}>
           {module?.video ? (
-            <video
-              key={module._id}
-              className='w-full h-full object-contain'
-              src={module.video}
-              controls
-              autoPlay={false}
-            />
+            <>
+              <video
+                ref={videoRef}
+                key={module._id}
+                className='w-full h-full object-contain'
+                src={module.video}
+                controls
+                autoPlay={false}
+              />
+              {/* Playback speed selector */}
+              <div className='absolute top-3 left-3'>
+                <select
+                  value={playbackSpeed}
+                  onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
+                  className='text-xs font-bold px-2 py-1 rounded-lg border border-white/20 cursor-pointer'
+                  style={{ background: 'rgba(0,0,0,0.7)', color: 'white', backdropFilter: 'blur(8px)' }}
+                >
+                  {SPEEDS.map(s => (
+                    <option key={s} value={s}>{s}x</option>
+                  ))}
+                </select>
+              </div>
+            </>
           ) : (
             <div className='w-full h-full flex flex-col items-center justify-center gap-3 text-zinc-700'>
               <PlayCircle className='w-14 h-14 opacity-30' />
