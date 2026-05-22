@@ -1,26 +1,48 @@
 import { useGetPurchaseCourse } from '@/hooks/course.hook'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { useModuleStores } from '@/Store/module.store'
 import { useGetComment } from '@/hooks/module.hook'
 import { useForm } from 'react-hook-form'
 import { useCreateComment } from '@/hooks/comment.hook'
-import { useCheckQuiz, useCreateQuiz } from '@/hooks/quiz.hook'
-import { MessageCircle, Send, PlayCircle, FileQuestion, Trophy, CheckCircle, Layers, ArrowLeft } from 'lucide-react'
+import { useCreateQuiz } from '@/hooks/quiz.hook'
+import { useMarkComplete, useGetProgress } from '@/hooks/progress.hook'
+import { useSaveNote, useGetNote } from '@/hooks/note.hook'
+import {
+  MessageCircle, Send, PlayCircle, FileQuestion, Trophy,
+  CheckCircle2, Layers, ArrowLeft, StickyNote, CheckCheck,
+  ChevronRight, Award
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 const SinglePurchasedCourse = () => {
   const { register, handleSubmit, reset } = useForm()
+  const { register: noteRegister, handleSubmit: noteSubmit, setValue } = useForm()
   const navigate = useNavigate()
   const { setModule, module } = useModuleStores()
   const { id } = useParams()
+  const [activeTab, setActiveTab] = useState('discussion')
+
   const { data } = useGetPurchaseCourse(id)
   const { data: commentsData } = useGetComment(module?._id)
-  const { data: quizStatus } = useCheckQuiz(module?._id)
   const { mutate: createQuiz } = useCreateQuiz()
   const { mutate: postComment } = useCreateComment()
+  const { mutate: markComplete } = useMarkComplete()
+  const { data: progressData } = useGetProgress(id)
+  const { data: noteData } = useGetNote(module?._id)
+  const { mutate: saveNote } = useSaveNote()
+
+  const completedModules = progressData?.completedModules || []
+  const moduleCount = data?.modules?.length || 0
+  const completedCount = completedModules.length
+  const progressPercent = moduleCount > 0 ? Math.round((completedCount / moduleCount) * 100) : 0
+
+  const isCompleted = (moduleId) => completedModules.map(String).includes(String(moduleId))
+
+  useEffect(() => {
+    setValue('content', noteData?.content || '')
+  }, [noteData?.content, module?._id, setValue])
 
   const createQuizHandler = (mod) => {
     createQuiz(
@@ -36,17 +58,30 @@ const SinglePurchasedCourse = () => {
     )
   }
 
-  const moduleCount = data?.modules?.length || 0
-  const completedModules = 0
+  const markCompleteHandler = () => {
+    if (!module?._id) return
+    markComplete(
+      { moduleId: module._id, courseId: id },
+      { onSuccess: () => toast.success('Module marked complete!') }
+    )
+  }
+
+  const saveNoteHandler = (formData) => {
+    if (!module?._id) return
+    saveNote(
+      { moduleId: module._id, content: formData.content },
+      { onSuccess: () => toast.success('Note saved!') }
+    )
+  }
 
   return (
-    <div className='flex h-screen bg-slate-100 overflow-hidden'>
+    <div className='flex h-screen bg-[#09090b] overflow-hidden'>
 
-      {/* LEFT: Video + Comments */}
-      <div className='flex flex-col w-[55%] min-w-0 border-r border-slate-200'>
+      {/* LEFT: Video + Tabs */}
+      <div className='flex flex-col w-[58%] min-w-0 border-r border-white/5'>
 
         {/* Video player */}
-        <div className='relative bg-slate-900 flex-shrink-0' style={{ height: '52%' }}>
+        <div className='relative bg-black flex-shrink-0' style={{ height: '55%' }}>
           {module?.video ? (
             <video
               key={module._id}
@@ -56,154 +91,234 @@ const SinglePurchasedCourse = () => {
               autoPlay={false}
             />
           ) : (
-            <div className='w-full h-full flex flex-col items-center justify-center gap-4 text-slate-500'>
-              <PlayCircle className='w-16 h-16 opacity-30' />
-              <p className='text-sm font-medium opacity-60'>Select a module to start watching</p>
+            <div className='w-full h-full flex flex-col items-center justify-center gap-3 text-zinc-700'>
+              <PlayCircle className='w-14 h-14 opacity-30' />
+              <p className='text-sm font-medium'>Select a module to start watching</p>
             </div>
           )}
 
+          {/* Module title + complete button overlay */}
           {module && (
-            <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-5 py-4'>
-              <p className='text-white font-semibold text-sm truncate'>{module.title}</p>
+            <div className='absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-5 py-4'>
+              <div className='flex items-center justify-between gap-4'>
+                <p className='text-white font-semibold text-sm truncate flex-1'>{module.title}</p>
+                {!isCompleted(module._id) ? (
+                  <button
+                    onClick={markCompleteHandler}
+                    className='flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/20
+                      hover:bg-indigo-500/40 text-indigo-300 text-xs font-semibold rounded-lg
+                      border border-indigo-500/30 transition-all whitespace-nowrap flex-shrink-0'
+                  >
+                    <CheckCheck className='w-3.5 h-3.5' />
+                    Mark Complete
+                  </button>
+                ) : (
+                  <span className='flex items-center gap-1.5 px-3 py-1.5 bg-green-500/15
+                    text-green-400 text-xs font-semibold rounded-lg border border-green-500/25 flex-shrink-0'>
+                    <CheckCircle2 className='w-3.5 h-3.5' />
+                    Completed
+                  </span>
+                )}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Comments */}
-        <div className='flex flex-col flex-1 bg-white min-h-0'>
-          <div className='flex items-center gap-2.5 px-5 py-3.5 border-b border-slate-100 flex-shrink-0'>
-            <MessageCircle className='w-4 h-4 text-slate-500' />
-            <span className='text-sm font-bold text-slate-800'>Discussion</span>
-            <span className='text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-medium'>
-              {commentsData?.length || 0}
-            </span>
-          </div>
-
-          <div className='flex-1 overflow-y-auto px-5 py-4 space-y-3 min-h-0'>
-            {commentsData?.length ? (
-              commentsData.map((item, i) => (
-                <div key={item._id || i} className='flex gap-3'>
-                  <Avatar className='w-8 h-8 flex-shrink-0 mt-0.5'>
-                    <AvatarFallback className='bg-emerald-100 text-emerald-700 text-xs font-bold'>
-                      {item.userId?.fullName?.slice(0, 2).toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className='flex-1 min-w-0'>
-                    <div className='flex items-baseline gap-2 mb-1'>
-                      <span className='text-xs font-bold text-slate-800'>
-                        {item.userId?.fullName || 'Anonymous'}
-                      </span>
-                      <span className='text-xs text-slate-400'>
-                        {new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                      </span>
-                    </div>
-                    <p className='text-sm text-slate-700 leading-relaxed'>{item.comment}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className='flex flex-col items-center justify-center py-10 text-center'>
-                <MessageCircle className='w-10 h-10 text-slate-200 mb-3' />
-                <p className='text-sm text-slate-400'>No comments yet — be the first!</p>
-              </div>
-            )}
-          </div>
-
-          <div className='px-5 py-3 border-t border-slate-100 flex-shrink-0'>
-            <form onSubmit={handleSubmit(commentHandler)} className='flex gap-2'>
-              <input
-                type='text'
-                placeholder={module ? 'Ask a question or share a thought...' : 'Select a module first'}
-                disabled={!module?._id}
-                className='flex-1 px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl
-                  focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
-                  disabled:opacity-50 disabled:cursor-not-allowed transition-all'
-                {...register('comment', { required: true })}
-              />
-              <button type='submit' disabled={!module?._id}
-                className='px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl
-                  flex items-center gap-1.5 text-sm font-semibold disabled:opacity-50
-                  disabled:cursor-not-allowed transition-all shadow-sm'>
-                <Send className='w-3.5 h-3.5' />
+        {/* Tabs */}
+        <div className='flex-1 flex flex-col bg-zinc-950/50 min-h-0'>
+          <div className='flex border-b border-white/5 flex-shrink-0'>
+            {['discussion', 'notes'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold capitalize transition-colors
+                  ${activeTab === tab
+                    ? 'text-white border-b-2 border-indigo-500 -mb-px'
+                    : 'text-zinc-600 hover:text-zinc-300'}`}
+              >
+                {tab === 'discussion'
+                  ? <MessageCircle className='w-3.5 h-3.5' />
+                  : <StickyNote className='w-3.5 h-3.5' />}
+                {tab}
+                {tab === 'discussion' && commentsData?.length > 0 && (
+                  <span className='bg-zinc-800 text-zinc-400 text-xs px-1.5 py-0.5 rounded-md'>
+                    {commentsData.length}
+                  </span>
+                )}
               </button>
-            </form>
+            ))}
           </div>
+
+          {/* Discussion tab */}
+          {activeTab === 'discussion' && (
+            <>
+              <div className='flex-1 overflow-y-auto px-5 py-4 space-y-4 min-h-0'>
+                {commentsData?.length ? commentsData.map((item, i) => (
+                  <div key={item._id || i} className='flex gap-3'>
+                    <Avatar className='w-7 h-7 flex-shrink-0 mt-0.5'>
+                      <AvatarFallback className='bg-indigo-500/20 text-indigo-300 text-xs font-bold'>
+                        {item.userId?.fullName?.slice(0, 2).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-baseline gap-2 mb-1'>
+                        <span className='text-xs font-semibold text-zinc-300'>
+                          {item.userId?.fullName || 'Anonymous'}
+                        </span>
+                        <span className='text-xs text-zinc-700'>
+                          {new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                      <p className='text-sm text-zinc-400 leading-relaxed'>{item.comment}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <div className='flex flex-col items-center justify-center py-10 text-center'>
+                    <MessageCircle className='w-8 h-8 text-zinc-800 mb-3' />
+                    <p className='text-sm text-zinc-700'>No comments yet — be the first!</p>
+                  </div>
+                )}
+              </div>
+              <div className='px-4 py-3 border-t border-white/5 flex-shrink-0'>
+                <form onSubmit={handleSubmit(commentHandler)} className='flex gap-2'>
+                  <input
+                    type='text'
+                    placeholder={module ? 'Ask a question...' : 'Select a module first'}
+                    disabled={!module?._id}
+                    className='input-dark flex-1 px-3 py-2 text-sm'
+                    {...register('comment', { required: true })}
+                  />
+                  <button type='submit' disabled={!module?._id}
+                    className='btn-primary px-3 py-2 flex items-center'>
+                    <Send className='w-3.5 h-3.5' />
+                  </button>
+                </form>
+              </div>
+            </>
+          )}
+
+          {/* Notes tab */}
+          {activeTab === 'notes' && (
+            <div className='flex-1 flex flex-col p-4 min-h-0'>
+              {module?._id ? (
+                <form onSubmit={noteSubmit(saveNoteHandler)} className='flex flex-col flex-1 gap-3'>
+                  <p className='text-xs text-zinc-600 font-medium'>
+                    Notes for: <span className='text-zinc-400'>{module.title}</span>
+                  </p>
+                  <textarea
+                    {...noteRegister('content')}
+                    placeholder='Write your notes here...'
+                    className='input-dark flex-1 p-3 text-sm resize-none min-h-0'
+                  />
+                  <button type='submit' className='btn-primary py-2 text-sm self-end px-5'>
+                    Save Note
+                  </button>
+                </form>
+              ) : (
+                <div className='flex flex-col items-center justify-center flex-1 text-center'>
+                  <StickyNote className='w-8 h-8 text-zinc-800 mb-3' />
+                  <p className='text-sm text-zinc-700'>Select a module to take notes</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* RIGHT: Course content */}
-      <div className='flex flex-col flex-1 bg-white min-w-0 overflow-hidden'>
+      {/* RIGHT: Module sidebar */}
+      <div className='flex flex-col flex-1 bg-zinc-950 min-w-0 overflow-hidden'>
         {/* Header */}
-        <div className='px-6 py-4 border-b border-slate-100 flex-shrink-0'>
+        <div className='px-5 py-4 border-b border-white/5 flex-shrink-0'>
           <button onClick={() => navigate('/YourCourse')}
-            className='flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-700 font-medium mb-3 transition-colors'>
-            <ArrowLeft size={13} />
-            My Courses
+            className='flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 font-medium mb-3 transition-colors'>
+            <ArrowLeft size={12} /> My Courses
           </button>
-          <h2 className='font-black text-slate-900 text-base line-clamp-1'>{data?.title}</h2>
-          <div className='flex items-center gap-3 mt-2'>
-            <span className='flex items-center gap-1 text-xs text-slate-500'>
-              <Layers size={12} />
-              {moduleCount} modules
-            </span>
-            <span className='flex items-center gap-1 text-xs text-emerald-600 font-semibold'>
-              <CheckCircle size={12} />
-              {completedModules} completed
-            </span>
+          <h2 className='font-bold text-white text-sm line-clamp-1 mb-3'>{data?.title}</h2>
+
+          {/* Progress */}
+          <div className='space-y-1.5'>
+            <div className='flex items-center justify-between text-xs'>
+              <span className='text-zinc-600 flex items-center gap-1'>
+                <Layers size={11} /> {moduleCount} modules
+              </span>
+              <span className='text-indigo-400 font-semibold'>{progressPercent}% complete</span>
+            </div>
+            <div className='progress-bar'>
+              <div className='progress-fill' style={{ width: `${progressPercent}%` }} />
+            </div>
           </div>
+
+          {progressPercent === 100 && (
+            <button
+              onClick={() => navigate(`/certificate/${id}`)}
+              className='mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-lg
+                bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 text-xs font-semibold
+                border border-amber-500/25 transition-all'
+            >
+              <Award className='w-3.5 h-3.5' />
+              Get Your Certificate
+            </button>
+          )}
         </div>
 
         {/* Module list */}
-        <div className='flex-1 overflow-y-auto px-4 py-4'>
+        <div className='flex-1 overflow-y-auto px-3 py-3'>
           {data?.modules?.length ? (
-            <div className='space-y-2'>
+            <div className='space-y-1'>
               {data.modules.map((item, index) => {
                 const isActive = module?._id === item._id
+                const done = isCompleted(item._id)
                 return (
-                  <Accordion key={item._id || index} type='single' collapsible>
-                    <AccordionItem value={`mod-${index}`}
-                      className={`border rounded-xl overflow-hidden transition-all ${isActive ? 'border-emerald-300 bg-emerald-50/50' : 'border-slate-200 bg-white'}`}>
-                      <AccordionTrigger
-                        onClick={() => setModule(item)}
-                        className='px-4 py-3 hover:bg-slate-50 transition-colors text-left w-full'
-                      >
-                        <div className='flex items-center gap-3 flex-1 min-w-0'>
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0
-                            ${isActive ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                            {index + 1}
-                          </div>
-                          <span className={`text-sm font-semibold truncate ${isActive ? 'text-emerald-700' : 'text-slate-800'}`}>
-                            {item.title}
-                          </span>
-                        </div>
-                      </AccordionTrigger>
+                  <div key={item._id || index}>
+                    <button
+                      onClick={() => setModule(item)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all
+                        ${isActive
+                          ? 'bg-indigo-500/15 border border-indigo-500/25'
+                          : 'hover:bg-white/4 border border-transparent'}`}
+                    >
+                      <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0
+                        ${done ? 'bg-green-500/20 text-green-400'
+                          : isActive ? 'bg-indigo-500 text-white'
+                          : 'bg-zinc-800 text-zinc-500'}`}>
+                        {done ? <CheckCircle2 size={13} /> : index + 1}
+                      </div>
+                      <span className={`text-xs font-medium line-clamp-2 flex-1 text-left
+                        ${isActive ? 'text-indigo-300' : done ? 'text-zinc-600' : 'text-zinc-300'}`}>
+                        {item.title}
+                      </span>
+                      {isActive && <ChevronRight size={12} className='text-indigo-400 flex-shrink-0' />}
+                    </button>
 
-                      <AccordionContent className='px-4 pb-3 border-t border-slate-100 bg-slate-50/50'>
-                        <div className='flex gap-2 pt-3'>
-                          {!item.quiz ? (
-                            <button onClick={() => createQuizHandler(item)}
-                              className='flex items-center gap-1.5 px-3 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-lg transition-all'>
-                              <FileQuestion size={13} />
-                              Generate Quiz
-                            </button>
-                          ) : (
-                            <button onClick={() => navigate(`/quiz/${item.quiz}`)}
-                              className='flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-all shadow-sm'>
-                              <Trophy size={13} />
-                              Take Quiz
-                            </button>
-                          )}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
+                    {/* Quiz buttons — shown when this module is active */}
+                    {isActive && (
+                      <div className='px-3 pb-2 flex gap-2'>
+                        {!item.quiz ? (
+                          <button onClick={() => createQuizHandler(item)}
+                            className='flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg
+                              bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-white/5 transition-all'>
+                            <FileQuestion size={12} />
+                            Generate Quiz
+                          </button>
+                        ) : (
+                          <button onClick={() => navigate(`/quiz/${item.quiz}`)}
+                            className='flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg
+                              bg-indigo-500/15 hover:bg-indigo-500/30 text-indigo-400
+                              border border-indigo-500/25 transition-all'>
+                            <Trophy size={12} />
+                            Take Quiz
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )
               })}
             </div>
           ) : (
-            <div className='flex flex-col items-center justify-center h-full text-center py-16'>
-              <Layers className='w-12 h-12 text-slate-200 mb-3' />
-              <p className='text-sm text-slate-400'>No modules available yet</p>
+            <div className='flex flex-col items-center justify-center h-full text-center py-12'>
+              <Layers className='w-10 h-10 text-zinc-800 mb-3' />
+              <p className='text-sm text-zinc-700'>No modules yet</p>
             </div>
           )}
         </div>

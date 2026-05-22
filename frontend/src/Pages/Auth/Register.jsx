@@ -3,134 +3,149 @@ import { useRegisterHook } from '@/hooks/User.hook'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { User, Mail, Lock, Eye, EyeOff, BookOpen, CheckCircle } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, User, GraduationCap, CheckCircle2 } from 'lucide-react'
 
 const Register = () => {
-  const { register, handleSubmit } = useForm()
+  const { register, handleSubmit, formState: { errors } } = useForm()
   const { mutate, isPending } = useRegisterHook()
   const [showPass, setShowPass] = useState(false)
 
   const perks = [
     'Access 50+ expert-led courses',
     'AI-generated quizzes per module',
-    'Progress tracking & certificates',
-    'Community discussions',
+    'Track your learning progress',
+    'Earn completion certificates',
+    'Module discussion & comments',
+    'Lifetime access after purchase',
   ]
 
   return (
-    <div className='min-h-screen flex bg-slate-50'>
+    <div className='min-h-screen flex bg-[#09090b]'>
       {/* Left panel */}
-      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 items-center justify-center p-16 relative overflow-hidden'>
-        <div className='absolute inset-0 opacity-10'>
-          <div className='absolute top-20 right-20 w-64 h-64 bg-emerald-500 rounded-full blur-3xl' />
-          <div className='absolute bottom-20 left-20 w-80 h-80 bg-blue-500 rounded-full blur-3xl' />
-        </div>
-        <div className='relative'>
-          <div className='w-20 h-20 bg-emerald-500/20 border border-emerald-500/30 rounded-3xl flex items-center justify-center mb-8'>
-            <BookOpen className='w-10 h-10 text-emerald-400' />
+      <div className='hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col justify-between p-14'>
+        <div className='absolute inset-0 mesh-bg' />
+        <div className='absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent' />
+
+        <div className='relative flex items-center gap-2.5'>
+          <div className='w-9 h-9 bg-indigo-500 rounded-xl flex items-center justify-center'>
+            <GraduationCap className='w-5 h-5 text-white' />
           </div>
-          <h2 className='text-3xl font-black text-white mb-3'>Start Learning Today</h2>
-          <p className='text-slate-400 mb-10 max-w-sm'>
-            Join thousands of students upgrading their skills on EduSmart
+          <span className='text-lg font-bold text-white'>EduSmart</span>
+        </div>
+
+        <div className='relative'>
+          <div className='inline-flex items-center gap-2 badge-indigo mb-6'>
+            <span className='w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse' />
+            Join 2,000+ learners today
+          </div>
+          <h2 className='text-4xl lg:text-5xl font-black text-white leading-tight mb-4'>
+            Start learning<br />
+            <span className='gradient-text'>the smart way</span>
+          </h2>
+          <p className='text-zinc-400 text-lg leading-relaxed max-w-md mb-10'>
+            Everything you need to level up your skills, in one beautifully designed platform.
           </p>
-          <div className='space-y-4'>
-            {perks.map((p, i) => (
-              <div key={i} className='flex items-center gap-3'>
-                <div className='w-6 h-6 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center flex-shrink-0'>
-                  <CheckCircle className='w-3.5 h-3.5 text-emerald-400' />
-                </div>
-                <span className='text-slate-300 text-sm'>{p}</span>
+
+          <div className='space-y-3'>
+            {perks.map((perk) => (
+              <div key={perk} className='flex items-center gap-3'>
+                <CheckCircle2 className='w-4 h-4 text-indigo-400 flex-shrink-0' />
+                <span className='text-zinc-300 text-sm font-medium'>{perk}</span>
               </div>
             ))}
           </div>
         </div>
+
+        <div className='relative surface p-5 max-w-md'>
+          <p className='text-zinc-300 text-sm leading-relaxed italic'>
+            "The best investment I made was signing up for EduSmart. The structured courses and quizzes kept me on track."
+          </p>
+          <p className='text-zinc-500 text-xs mt-3 font-medium'>— Rahul K., Backend Engineer</p>
+        </div>
       </div>
 
       {/* Right panel */}
-      <div className='flex-1 flex items-center justify-center px-6 py-12'>
-        <div className='w-full max-w-md'>
-          {/* Logo (mobile) */}
-          <div className='flex items-center gap-3 mb-10 lg:hidden'>
-            <div className='w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center'>
-              <BookOpen className='w-5 h-5 text-white' />
+      <div className='flex-1 flex items-center justify-center px-6 py-12 relative'>
+        <div className='absolute inset-0 bg-zinc-950/50' />
+        <div className='relative w-full max-w-sm'>
+          <div className='flex items-center gap-2.5 mb-10 lg:hidden'>
+            <div className='w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center'>
+              <GraduationCap className='w-4 h-4 text-white' />
             </div>
-            <span className='text-xl font-black text-slate-900'>EduSmart</span>
+            <span className='text-base font-bold text-white'>EduSmart</span>
           </div>
 
-          <h1 className='text-3xl font-black text-slate-900 mb-2'>Create account</h1>
-          <p className='text-slate-500 mb-8'>Join EduSmart and start learning for free</p>
+          <h1 className='text-2xl font-black text-white mb-1 tracking-tight'>Create your account</h1>
+          <p className='text-zinc-500 text-sm mb-8'>Free to join, start learning today</p>
 
-          <form onSubmit={handleSubmit((d) => mutate(d))} className='space-y-5'>
-            {/* Full Name */}
+          <form onSubmit={handleSubmit((d) => mutate(d))} className='space-y-4'>
             <div>
-              <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Full Name</label>
+              <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>
+                Full Name
+              </label>
               <div className='relative'>
-                <User className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' size={18} />
+                <User className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600' />
                 <input
                   type='text'
                   placeholder='John Doe'
-                  {...register('fullName', { required: true })}
-                  className='w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-xl
-                    focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 focus:outline-none
-                    transition-all text-sm bg-white'
+                  {...register('fullName', { required: 'Full name is required' })}
+                  className='input-dark w-full pl-10 pr-4 py-2.5 text-sm'
                 />
               </div>
+              {errors.fullName && <p className='text-xs text-red-400 mt-1'>{errors.fullName.message}</p>}
             </div>
 
-            {/* Email */}
             <div>
-              <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Email</label>
+              <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>
+                Email
+              </label>
               <div className='relative'>
-                <Mail className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' size={18} />
+                <Mail className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600' />
                 <input
                   type='email'
                   placeholder='you@example.com'
-                  {...register('email', { required: true })}
-                  className='w-full pl-11 pr-4 py-3 border-2 border-slate-200 rounded-xl
-                    focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 focus:outline-none
-                    transition-all text-sm bg-white'
+                  {...register('email', { required: 'Email is required' })}
+                  className='input-dark w-full pl-10 pr-4 py-2.5 text-sm'
                 />
               </div>
+              {errors.email && <p className='text-xs text-red-400 mt-1'>{errors.email.message}</p>}
             </div>
 
-            {/* Password */}
             <div>
-              <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Password</label>
+              <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>
+                Password
+              </label>
               <div className='relative'>
-                <Lock className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' size={18} />
+                <Lock className='absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600' />
                 <input
                   type={showPass ? 'text' : 'password'}
-                  placeholder='Min. 8 characters'
-                  {...register('password', { required: true })}
-                  className='w-full pl-11 pr-12 py-3 border-2 border-slate-200 rounded-xl
-                    focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 focus:outline-none
-                    transition-all text-sm bg-white'
+                  placeholder='Min. 6 characters'
+                  {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'At least 6 characters' } })}
+                  className='input-dark w-full pl-10 pr-11 py-2.5 text-sm'
                 />
                 <button
                   type='button'
                   onClick={() => setShowPass(!showPass)}
-                  className='absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
+                  className='absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-300 transition-colors'
                 >
-                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
+              {errors.password && <p className='text-xs text-red-400 mt-1'>{errors.password.message}</p>}
             </div>
 
             <button
               type='submit'
               disabled={isPending}
-              className='w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white
-                font-bold text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40
-                hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60
-                disabled:translate-y-0 flex items-center justify-center'
+              className='btn-primary w-full py-2.5 text-sm mt-2 flex items-center justify-center gap-2'
             >
               {isPending ? <Spinner /> : 'Create Account'}
             </button>
           </form>
 
-          <p className='text-sm text-center text-slate-500 mt-8'>
+          <p className='text-sm text-center text-zinc-600 mt-6'>
             Already have an account?{' '}
-            <Link to='/login' className='text-emerald-600 font-semibold hover:text-emerald-500 transition-colors'>
+            <Link to='/login' className='text-indigo-400 font-semibold hover:text-indigo-300 transition-colors'>
               Sign in
             </Link>
           </p>

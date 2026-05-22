@@ -1,8 +1,7 @@
 import { useCheckoutSuccess } from '@/hooks/payment.hook'
 import React, { useEffect } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { CheckCircle, ArrowRight, Home } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
+import { CheckCircle2, ArrowRight, BookOpen } from 'lucide-react'
 
 const PaymenSuccess = () => {
   const [searchParams] = useSearchParams()
@@ -11,59 +10,49 @@ const PaymenSuccess = () => {
 
   useEffect(() => {
     const sessionId = searchParams.get('session_id')
-    if (sessionId) {
-      mutate(sessionId)
-    }
+    if (sessionId) mutate(sessionId)
   }, [searchParams, mutate])
 
   useEffect(() => {
     if (isSuccess) {
-      const timer = setTimeout(() => {
-        navigate('/dashboard')
-      }, 5000)
-      return () => clearTimeout(timer)
+      const t = setTimeout(() => navigate('/YourCourse'), 5000)
+      return () => clearTimeout(t)
     }
   }, [isSuccess, navigate])
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-emerald-50 to-green-50 flex items-center justify-center px-6 py-12'>
-      <div className='max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-12 text-center border border-emerald-200'>
-        <div className='w-28 h-28 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-8 p-6'>
-          <CheckCircle className='w-16 h-16 text-emerald-600' />
+    <div className='min-h-screen bg-[#09090b] flex items-center justify-center px-6 mesh-bg'>
+      <div className='max-w-md w-full surface-lg p-10 text-center'>
+        <div className='w-16 h-16 bg-green-500/15 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-green-500/25'>
+          <CheckCircle2 className='w-8 h-8 text-green-400' />
         </div>
-        
-        <h1 className='text-4xl font-black text-slate-900 mb-4'>Payment Successful!</h1>
-        <p className='text-xl text-slate-600 mb-8 leading-relaxed'>
-          Thank you for your purchase. Your course access is now active.
+
+        <h1 className='text-2xl font-black text-white mb-2'>Payment Successful!</h1>
+        <p className='text-zinc-500 text-sm mb-8 leading-relaxed'>
+          Your course access is now active. Start learning right away.
         </p>
-        
-        <div className='space-y-4 mb-12'>
-          <div className='bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6'>
-            <div className='flex items-center justify-center gap-3 text-emerald-700'>
-              <CheckCircle className='w-6 h-6' />
-              <span className='font-semibold'>Course unlocked successfully</span>
-            </div>
+
+        <div className='space-y-3 mb-8'>
+          <div className='flex items-center gap-3 p-3.5 bg-green-500/8 rounded-xl border border-green-500/15 text-sm text-green-400'>
+            <CheckCircle2 className='w-4 h-4 flex-shrink-0' />
+            Course unlocked successfully
           </div>
-          
-          <div className='bg-blue-50 border-2 border-blue-200 rounded-2xl p-6'>
-            <div className='flex items-center justify-center gap-3 text-blue-700'>
-              <ArrowRight className='w-6 h-6' />
-              <span className='font-semibold'>Redirecting to dashboard in 5s...</span>
-            </div>
+          <div className='flex items-center gap-3 p-3.5 bg-indigo-500/8 rounded-xl border border-indigo-500/15 text-sm text-indigo-400'>
+            <ArrowRight className='w-4 h-4 flex-shrink-0' />
+            Redirecting to My Courses in 5s...
           </div>
         </div>
-        
-        <div className='flex gap-4 justify-center'>
-          <Link to='/dashboard'>
-            <button className='flex items-center gap-2 px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200'>
-              Go to Dashboard
+
+        <div className='flex gap-3'>
+          <Link to='/YourCourse' className='flex-1'>
+            <button className='btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2'>
+              <BookOpen className='w-4 h-4' />
+              My Courses
             </button>
           </Link>
-          
-          <Link to='/'>
-            <button className='flex items-center gap-2 px-8 py-4 border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200'>
-              <Home className='w-5 h-5' />
-              Back to Home
+          <Link to='/' className='flex-1'>
+            <button className='btn-ghost w-full py-2.5 text-sm'>
+              Browse More
             </button>
           </Link>
         </div>

@@ -2,117 +2,146 @@ import { useGetSingleCourseHook } from '@/hooks/course.hook'
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,DialogTrigger
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog"
 import { useForm } from 'react-hook-form'
 import { useCreateModule } from '@/hooks/module.hook'
 import { Spinner } from '@/components/ui/spinner'
+import { Plus, PlayCircle, Layers, Video } from 'lucide-react'
 
 const CreateModule = () => {
   const { id } = useParams()
   const { data } = useGetSingleCourseHook(id)
   const [openModule, setOpenModule] = useState(false)
+  const [videoName, setVideoName] = useState(null)
 
   const { register, handleSubmit, reset } = useForm()
   const { mutate, isPending } = useCreateModule()
 
-  const moduleFormHandler = (data) => {
-    const formData = new FormData()
-    formData.append('title', data.title)
-    formData.append('video', data.video[0])
-    formData.append('courseId', id)
+  const moduleFormHandler = (formData) => {
+    const fd = new FormData()
+    fd.append('title', formData.title)
+    fd.append('video', formData.video[0])
+    fd.append('courseId', id)
 
-    mutate(formData, {
+    mutate(fd, {
       onSuccess: () => {
         setOpenModule(false)
         reset()
+        setVideoName(null)
       }
     })
   }
 
   return (
-    <div className='p-8 max-w-4xl mx-auto'>
+    <div className='min-h-screen bg-[#09090b] p-7'>
       {/* Course Header */}
-      <div className='mb-12'>
-        <h1 className='text-3xl font-black text-slate-900 mb-2'>{data?.title}</h1>
-        <div className='flex items-center gap-2 text-sm text-slate-600'>
-          <span>Total Modules: {data?.modules?.length || 0}</span>
+      <div className='mb-7'>
+        <div className='flex items-start justify-between'>
+          <div>
+            <h1 className='text-xl font-black text-white mb-1'>{data?.title || 'Course Modules'}</h1>
+            <div className='flex items-center gap-2 text-sm text-zinc-600'>
+              <Layers size={13} />
+              <span>{data?.modules?.length || 0} modules</span>
+            </div>
+          </div>
+
+          <Dialog open={openModule} onOpenChange={setOpenModule}>
+            <DialogTrigger asChild>
+              <button className='btn-primary flex items-center gap-2 px-4 py-2.5 text-sm'>
+                <Plus size={15} />
+                Add Module
+              </button>
+            </DialogTrigger>
+
+            <DialogContent className='max-w-md bg-zinc-900 border border-white/8 text-white shadow-2xl'>
+              <DialogHeader>
+                <DialogTitle className='text-base font-bold text-white'>New Module</DialogTitle>
+              </DialogHeader>
+
+              <form onSubmit={handleSubmit(moduleFormHandler)} className='space-y-4 mt-1'>
+                <div>
+                  <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>Module Title</label>
+                  <input
+                    type='text'
+                    placeholder='e.g. Introduction to React Hooks'
+                    className='input-dark w-full'
+                    {...register('title', { required: true })}
+                  />
+                </div>
+
+                <div>
+                  <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>Video File</label>
+                  <label className='flex flex-col items-center justify-center w-full h-24 border border-dashed border-white/15 hover:border-indigo-500/50 rounded-xl cursor-pointer bg-zinc-800/50 hover:bg-indigo-500/5 transition-all'>
+                    <Video size={20} className='text-zinc-600 mb-1.5' />
+                    {videoName
+                      ? <span className='text-xs text-indigo-400 font-medium px-4 text-center line-clamp-1'>{videoName}</span>
+                      : <span className='text-xs text-zinc-600'>Click to upload video</span>
+                    }
+                    <input
+                      type='file'
+                      accept='video/*'
+                      className='hidden'
+                      {...register('video', { required: true })}
+                      onChange={(e) => {
+                        register('video').onChange(e)
+                        if (e.target.files[0]) setVideoName(e.target.files[0].name)
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <button
+                  type='submit'
+                  disabled={isPending}
+                  className='btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2 disabled:opacity-50'
+                >
+                  {isPending ? <><Spinner /> Uploading...</> : 'Create Module'}
+                </button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Create Module Button */}
-      <Dialog open={openModule} onOpenChange={setOpenModule}>
-        <DialogTrigger className='inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200'>
-          <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
-          </svg>
-          Create New Module
-        </DialogTrigger>
-        
-        <DialogContent className='max-w-md'>
-          <DialogHeader>
-            <DialogTitle className='text-2xl font-bold'>New Module</DialogTitle>
-            <form onSubmit={handleSubmit(moduleFormHandler)} className='space-y-6 mt-6'>
-              <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-2'>Module Title</label>
-                <input 
-                  type="text" 
-                  placeholder='Enter module title'  
-                  className='w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 focus:outline-none transition-all' 
-                  {...register('title', { required: true })}
-                />
+      {/* Modules Grid */}
+      {(!data?.modules || data.modules.length === 0) ? (
+        <div className='surface-lg p-16 text-center'>
+          <PlayCircle className='w-12 h-12 text-zinc-700 mx-auto mb-4' />
+          <h3 className='text-base font-bold text-white mb-1'>No modules yet</h3>
+          <p className='text-zinc-600 text-sm'>Add your first module to get started</p>
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {data.modules.map((item, index) => (
+            <div
+              key={item._id || index}
+              className='surface-lg p-5 hover:border-indigo-500/25 transition-all duration-200'
+            >
+              <div className='flex items-start gap-3.5 mb-4'>
+                <div className='w-9 h-9 bg-indigo-500/15 rounded-xl flex items-center justify-center flex-shrink-0 border border-indigo-500/20'>
+                  <PlayCircle className='w-4.5 h-4.5 text-indigo-400' size={18} />
+                </div>
+                <div className='flex-1 min-w-0'>
+                  <h3 className='font-semibold text-white text-sm leading-snug line-clamp-2'>{item.title}</h3>
+                  <p className='text-xs text-zinc-600 mt-0.5'>Module {index + 1}</p>
+                </div>
               </div>
-              
-              <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-2'>Video File</label>
-                <input 
-                  type="file" 
-                  accept='video/*' 
-                  className='w-full px-4 py-3 border-2 border-slate-200 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-all cursor-pointer' 
-                  {...register('video', { required: true })}
-                />
-              </div>
-              
-              <button 
-                type='submit' 
-                disabled={isPending}
-                className='w-full flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-500 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200'
-              >
-                {isPending ? (
-                  <>
-                    <Spinner />
-                    Creating...
-                  </>
-                ) : (
-                  'Create Module'
-                )}
-              </button>
-            </form>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
 
-      {/* Modules List */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12'>
-        {data?.modules?.map((item, index) => (
-          <div key={item._id || index} className='group bg-white border border-slate-200 rounded-2xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-pointer hover:border-slate-300'>
-            <div className='flex items-center gap-3 mb-4'>
-              <div className='w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center flex-shrink-0'>
-                <svg className='w-6 h-6 text-emerald-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z' />
-                </svg>
-              </div>
-              <div>
-                <h3 className='font-bold text-xl text-slate-900 group-hover:text-slate-700'>{item.title}</h3>
-                <p className='text-sm text-slate-500'>Module {index + 1}</p>
+              <div className='flex items-center gap-2'>
+                <span className='text-xs font-medium text-zinc-700 bg-zinc-800/80 border border-white/5 px-2 py-0.5 rounded-lg'>
+                  Video
+                </span>
+                {item.quiz && (
+                  <span className='text-xs font-medium text-violet-400 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded-lg'>
+                    Quiz
+                  </span>
+                )}
               </div>
             </div>
-            <div className='w-full bg-slate-200 rounded-full h-2'>
-              <div className='bg-emerald-500 h-2 rounded-full w-3/4'></div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

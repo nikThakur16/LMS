@@ -3,34 +3,35 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 
-export const useRegisterHook = ()=>{
-    const navigate =  useNavigate()
+export const useRegisterHook = () => {
+    const navigate = useNavigate()
     return useMutation({
-        mutationFn:registerApi,
-        onSuccess:(data)=>{
-            console.log(data)
-            toast.success(data.message)
-            navigate("/")
+        mutationFn: registerApi,
+        onSuccess: (data) => {
+            toast.success(data.message || 'Account created!')
+            navigate('/')
         },
-
-        onError:(err)=>{
-            console.log(err)
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Registration failed')
         }
     })
 }
 
-export const useLoginHook = ()=>{
+export const useLoginHook = () => {
     const navigate = useNavigate()
     return useMutation({
-        mutationFn:loginApi,
-        onSuccess:(data)=>{
-            toast.success(data?.message)
-            navigate('/')
+        mutationFn: loginApi,
+        onSuccess: (data) => {
+            toast.success(data?.message || 'Welcome back!')
+            // Redirect admin to dashboard, students to home
+            if (data?.user?.admin) {
+                navigate('/dashboard')
+            } else {
+                navigate('/')
+            }
         },
-
-        onError:(err)=>{
-            toast.error(err.response.data.message)
-           
+        onError: (err) => {
+            toast.error(err?.response?.data?.message || 'Invalid email or password')
         }
     })
 }

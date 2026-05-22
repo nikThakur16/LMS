@@ -15,6 +15,7 @@ import Quiz from '@/Pages/User/Quiz'
 import Cancel from '@/Pages/Admin/Cancel'
 import PaymenSuccess from '@/Pages/Admin/PaymenSuccess'
 import Profile from '@/Pages/User/Profile'
+import Certificate from '@/Pages/User/Certificate'
 
 const MainRoutes = () => {
   return (
@@ -64,6 +65,12 @@ const MainRoutes = () => {
       <Route path='/quiz/:id' element={
         <ProtectedRoutes>
           <Quiz />
+        </ProtectedRoutes>
+      } />
+
+      <Route path='/certificate/:id' element={
+        <ProtectedRoutes>
+          <Certificate />
         </ProtectedRoutes>
       } />
 

@@ -1,28 +1,54 @@
 import { useGetAllPurchaseCourse } from '@/hooks/course.hook'
-import { BookOpen, Clock, Play, ChevronRight } from 'lucide-react'
+import { useGetProgress } from '@/hooks/progress.hook'
+import { BookOpen, Play, ChevronRight, GraduationCap } from 'lucide-react'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+
+const CourseProgressBar = ({ courseId }) => {
+  const { data } = useGetProgress(courseId)
+  const percent = data?.percentage || 0
+  const completed = data?.completedCount || 0
+  const total = data?.totalModules || 0
+  return (
+    <div className='space-y-1.5 mt-3'>
+      <div className='flex items-center justify-between text-xs'>
+        <span className='text-zinc-600'>{completed}/{total} modules</span>
+        <span className={`font-semibold ${percent === 100 ? 'text-green-400' : 'text-indigo-400'}`}>
+          {percent}%
+        </span>
+      </div>
+      <div className='progress-bar'>
+        <div
+          className='progress-fill'
+          style={{
+            width: `${percent}%`,
+            background: percent === 100
+              ? 'linear-gradient(90deg,#22c55e,#4ade80)'
+              : undefined
+          }}
+        />
+      </div>
+    </div>
+  )
+}
 
 const YourCourse = () => {
   const { data, isLoading } = useGetAllPurchaseCourse()
   const navigate = useNavigate()
 
-  const navigateSinglePurchaseCourse = (id) => {
-    navigate(`/YourCourse/${id}`)
-  }
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="h-12 w-64 bg-slate-200 rounded-lg animate-pulse mb-8"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden border border-slate-200">
-                <div className="h-48 bg-slate-200 animate-pulse"></div>
-                <div className="p-4 space-y-3">
-                  <div className="h-6 bg-slate-200 rounded animate-pulse"></div>
-                  <div className="h-4 bg-slate-100 rounded animate-pulse"></div>
+      <div className='min-h-screen bg-[#09090b] p-8'>
+        <div className='max-w-6xl mx-auto'>
+          <div className='h-7 w-48 bg-zinc-800 rounded-lg animate-pulse mb-8' />
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
+            {[1,2,3,4].map((i) => (
+              <div key={i} className='surface-lg overflow-hidden animate-pulse'>
+                <div className='h-44 bg-zinc-800' />
+                <div className='p-4 space-y-3'>
+                  <div className='h-4 bg-zinc-800 rounded-lg w-3/4' />
+                  <div className='h-3 bg-zinc-800/50 rounded-lg' />
+                  <div className='h-8 bg-zinc-800 rounded-lg mt-4' />
                 </div>
               </div>
             ))}
@@ -32,103 +58,80 @@ const YourCourse = () => {
     )
   }
 
+  const courses = data?.purchasedCourse || []
+
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className='min-h-screen bg-[#09090b] px-6 py-10'>
+      <div className='max-w-6xl mx-auto'>
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
-            Your Courses
-          </h1>
-          <p className="text-slate-600 text-lg">
-            Continue learning from where you left off
+        <div className='mb-8'>
+          <h1 className='text-2xl font-black text-white tracking-tight mb-1'>My Learning</h1>
+          <p className='text-zinc-600 text-sm'>
+            {courses.length} enrolled course{courses.length !== 1 ? 's' : ''}
           </p>
         </div>
 
-        {/* Empty State */}
-        {!data?.purchasedCourse?.length ? (
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <BookOpen className="w-20 h-20 text-slate-300 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">No courses yet</h2>
-            <p className="text-slate-600 mb-8 max-w-md mx-auto">
-              Start learning today by exploring our course catalog
+        {/* Empty state */}
+        {!courses.length ? (
+          <div className='surface-lg p-16 text-center'>
+            <div className='w-14 h-14 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-5'>
+              <GraduationCap className='w-7 h-7 text-zinc-600' />
+            </div>
+            <h2 className='text-lg font-bold text-zinc-300 mb-2'>No courses yet</h2>
+            <p className='text-zinc-600 text-sm mb-6 max-w-xs mx-auto'>
+              Explore our course catalog and start learning today
             </p>
-            <button 
-              onClick={() => navigate('/courses')}
-              className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            <button
+              onClick={() => navigate('/')}
+              className='btn-primary px-6 py-2.5 text-sm'
             >
               Browse Courses
             </button>
           </div>
         ) : (
-          <>
-            {/* Course Count */}
-            <div className="mb-6 flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-600">
-                {data.purchasedCourse.length} {data.purchasedCourse.length === 1 ? 'Course' : 'Courses'}
-              </p>
-            </div>
-
-            {/* Course Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {data.purchasedCourse.map((item, index) => (
-                <div
-                  key={item._id || index}
-                  onClick={() => navigateSinglePurchaseCourse(item._id)}
-                  className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-emerald-300 hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1"
-                >
-                  {/* Thumbnail */}
-                  <div className="relative h-48 bg-slate-100 overflow-hidden">
-                    <img
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      src={item.thumbnail || '/placeholder-course.jpg'}
-                      alt={item.title}
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/400x300?text=Course'
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl">
-                          <Play className="w-7 h-7 text-emerald-600 ml-1" fill="currentColor" />
-                        </div>
-                      </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
+            {courses.map((item, index) => (
+              <div
+                key={item._id || index}
+                onClick={() => navigate(`/YourCourse/${item._id}`)}
+                className='surface-lg overflow-hidden cursor-pointer card-hover group'
+              >
+                {/* Thumbnail */}
+                <div className='relative h-44 bg-zinc-800 overflow-hidden'>
+                  <img
+                    className='h-full w-full object-cover group-hover:scale-105 transition-transform duration-500'
+                    src={item.thumbnail}
+                    alt={item.title}
+                  />
+                  <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100
+                    transition-all duration-300 flex items-center justify-center'>
+                    <div className='w-12 h-12 glass rounded-full flex items-center justify-center border border-white/20'>
+                      <Play className='w-5 h-5 text-white ml-0.5' fill='white' />
                     </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    {/* Title */}
-                    <h3 className="font-bold text-lg text-slate-900 mb-3 line-clamp-2 leading-snug group-hover:text-emerald-600 transition-colors">
-                      {item.title}
-                    </h3>
-
-                    {/* Meta Info */}
-                    <div className="flex items-center gap-4 text-xs text-slate-500 mb-4">
-                      {item.lessons && (
-                        <div className="flex items-center gap-1">
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span>{item.lessons} lessons</span>
-                        </div>
-                      )}
-                      {item.duration && (
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          <span>{item.duration}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Continue Button */}
-                    <button className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 group-hover:shadow-lg">
-                      Continue Learning
-                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </>
+
+                <div className='p-4'>
+                  <h3 className='font-semibold text-sm text-white line-clamp-2 leading-snug mb-1'>
+                    {item.title}
+                  </h3>
+                  <div className='flex items-center gap-1 text-xs text-zinc-600 mb-1'>
+                    <BookOpen className='w-3 h-3' />
+                    {item.modules?.length || 0} modules
+                  </div>
+
+                  {/* Per-course progress bar */}
+                  <CourseProgressBar courseId={item._id} />
+
+                  <button className='mt-4 w-full flex items-center justify-center gap-1.5 py-2
+                    btn-ghost text-xs font-semibold rounded-lg'>
+                    Continue
+                    <ChevronRight className='w-3.5 h-3.5' />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

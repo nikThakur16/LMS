@@ -9,6 +9,9 @@ import quizRoute from './src/routes/quiz.route.js'
 import commentRoute from './src/routes/comment.route.js'
 import paymentRoute from './src/routes/payment.route.js'
 import analyticRoute from './src/routes/analytic.route.js'
+import progressRoute from './src/routes/progress.route.js'
+import reviewRoute from './src/routes/review.route.js'
+import noteRoute from './src/routes/note.route.js'
 import cors from 'cors'
 
 const app = express()
@@ -30,6 +33,9 @@ app.use('/api/comment', commentRoute)
 
 app.use('/api/payment', paymentRoute)
 app.use('/api/analytic', analyticRoute)
+app.use('/api/progress', progressRoute)
+app.use('/api/review', reviewRoute)
+app.use('/api/note', noteRoute)
 
 
 

@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { Spinner } from '@/components/ui/spinner'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import { Plus, BookOpen, Users, IndianRupee, Layers, ChevronRight, Image } from 'lucide-react'
+import { Plus, BookOpen, Layers, ChevronRight, Image, IndianRupee } from 'lucide-react'
 
 const DasbhoardProducts = () => {
   const { data, isLoading } = useGetCourseHook()
@@ -34,66 +34,86 @@ const DasbhoardProducts = () => {
   }
 
   return (
-    <div className='min-h-screen bg-slate-50 p-8'>
+    <div className='min-h-screen bg-[#09090b] p-7'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-8'>
+      <div className='flex items-center justify-between mb-7'>
         <div>
-          <h1 className='text-2xl font-black text-slate-900'>Courses</h1>
-          <p className='text-slate-500 mt-1'>{data?.courses?.length || 0} courses published</p>
+          <h1 className='text-xl font-black text-white'>Courses</h1>
+          <p className='text-zinc-600 text-sm mt-0.5'>{data?.courses?.length || 0} courses published</p>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className='flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-emerald-500/25 hover:-translate-y-0.5 transition-all'>
-            <Plus size={16} />
-            Add Course
+          <DialogTrigger asChild>
+            <button className='btn-primary flex items-center gap-2 px-4 py-2.5 text-sm'>
+              <Plus size={15} />
+              Add Course
+            </button>
           </DialogTrigger>
 
-          <DialogContent className='sm:max-w-lg'>
+          <DialogContent className='sm:max-w-lg bg-zinc-900 border border-white/8 text-white shadow-2xl'>
             <DialogHeader>
-              <DialogTitle className='text-xl font-black'>Create New Course</DialogTitle>
+              <DialogTitle className='text-base font-bold text-white'>Create New Course</DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit(createCourseHandler)} className='space-y-4 mt-2'>
+            <form onSubmit={handleSubmit(createCourseHandler)} className='space-y-4 mt-1'>
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Course Title</label>
-                <input {...register('title', { required: true })} placeholder='e.g. Advanced React Development'
-                  className='w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 focus:outline-none text-sm transition-all' />
+                <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>Course Title</label>
+                <input
+                  {...register('title', { required: true })}
+                  placeholder='e.g. Advanced React Development'
+                  className='input-dark w-full'
+                />
               </div>
 
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Description</label>
-                <textarea {...register('description', { required: true })} placeholder='What will students learn?' rows={3}
-                  className='w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 focus:outline-none text-sm transition-all resize-none' />
+                <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>Description</label>
+                <textarea
+                  {...register('description', { required: true })}
+                  placeholder='What will students learn?'
+                  rows={3}
+                  className='input-dark w-full resize-none'
+                />
               </div>
 
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Price (₹)</label>
+                <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>Price (₹)</label>
                 <div className='relative'>
-                  <IndianRupee className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400' size={16} />
-                  <input type='number' {...register('amount', { required: true })} placeholder='999'
-                    className='w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 focus:outline-none text-sm transition-all' />
+                  <IndianRupee className='absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500' size={14} />
+                  <input
+                    type='number'
+                    {...register('amount', { required: true })}
+                    placeholder='999'
+                    className='input-dark w-full pl-9'
+                  />
                 </div>
               </div>
 
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-1.5'>Thumbnail</label>
+                <label className='block text-xs font-semibold text-zinc-400 mb-1.5 uppercase tracking-wider'>Thumbnail</label>
                 {thumbPreview && (
-                  <img src={thumbPreview} alt='preview' className='w-full h-32 object-cover rounded-xl mb-2 border border-slate-200' />
+                  <img src={thumbPreview} alt='preview' className='w-full h-28 object-cover rounded-xl mb-2 border border-white/8' />
                 )}
-                <label className='flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 hover:border-emerald-400 rounded-xl cursor-pointer bg-slate-50 hover:bg-emerald-50 transition-all'>
-                  <Image size={20} className='text-slate-400 mb-1' />
-                  <span className='text-xs text-slate-500'>Click to upload image</span>
-                  <input type='file' accept='image/*' className='hidden'
+                <label className='flex flex-col items-center justify-center w-full h-20 border border-dashed border-white/15 hover:border-indigo-500/50 rounded-xl cursor-pointer bg-zinc-800/50 hover:bg-indigo-500/5 transition-all'>
+                  <Image size={18} className='text-zinc-600 mb-1' />
+                  <span className='text-xs text-zinc-600'>Click to upload image</span>
+                  <input
+                    type='file'
+                    accept='image/*'
+                    className='hidden'
                     {...register('thumbnail', { required: true })}
                     onChange={(e) => {
                       register('thumbnail').onChange(e)
                       if (e.target.files[0]) setThumbPreview(URL.createObjectURL(e.target.files[0]))
-                    }} />
+                    }}
+                  />
                 </label>
               </div>
 
-              <button type='submit' disabled={isPending}
-                className='w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/25 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:translate-y-0'>
+              <button
+                type='submit'
+                disabled={isPending}
+                className='btn-primary w-full py-2.5 text-sm flex items-center justify-center gap-2 disabled:opacity-50'
+              >
                 {isPending ? <><Spinner /> Creating...</> : 'Create Course'}
               </button>
             </form>
@@ -103,62 +123,60 @@ const DasbhoardProducts = () => {
 
       {/* Grid */}
       {isLoading ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
           {[...Array(8)].map((_, i) => (
-            <div key={i} className='bg-white rounded-2xl overflow-hidden border border-slate-200 animate-pulse'>
-              <div className='h-44 bg-slate-200' />
-              <div className='p-4 space-y-3'>
-                <div className='h-4 bg-slate-200 rounded w-3/4' />
-                <div className='h-3 bg-slate-100 rounded w-full' />
+            <div key={i} className='surface-lg overflow-hidden animate-pulse'>
+              <div className='h-40 bg-zinc-800' />
+              <div className='p-4 space-y-2.5'>
+                <div className='h-3.5 bg-zinc-800 rounded w-3/4' />
+                <div className='h-3 bg-zinc-800/60 rounded w-full' />
               </div>
             </div>
           ))}
         </div>
       ) : data?.courses?.length === 0 ? (
-        <div className='bg-white rounded-2xl border border-slate-200 p-16 text-center'>
-          <BookOpen className='w-16 h-16 text-slate-300 mx-auto mb-4' />
-          <h3 className='text-xl font-bold text-slate-800 mb-2'>No courses yet</h3>
-          <p className='text-slate-500 text-sm'>Create your first course to get started</p>
+        <div className='surface-lg p-16 text-center'>
+          <BookOpen className='w-12 h-12 text-zinc-700 mx-auto mb-4' />
+          <h3 className='text-base font-bold text-white mb-1'>No courses yet</h3>
+          <p className='text-zinc-600 text-sm'>Create your first course to get started</p>
         </div>
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
           {data?.courses?.map((item) => (
             <div
               key={item._id}
               onClick={() => navigate(`/dashboard/CourseModule/${item._id}`)}
-              className='group bg-white rounded-2xl overflow-hidden border border-slate-200
-                hover:border-emerald-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer'
+              className='group surface-lg overflow-hidden hover:border-indigo-500/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer'
             >
-              <div className='relative h-44 overflow-hidden bg-slate-100'>
-                <img src={item.thumbnail} alt={item.title}
-                  className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500' />
-                <div className='absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity' />
-                <div className='absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity'>
-                  <div className='flex items-center gap-1 bg-white text-slate-800 text-xs font-bold px-2.5 py-1 rounded-full shadow-lg'>
-                    Manage <ChevronRight size={12} />
+              <div className='relative h-40 overflow-hidden bg-zinc-800'>
+                <img
+                  src={item.thumbnail}
+                  alt={item.title}
+                  className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
+                />
+                <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity' />
+                <div className='absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity'>
+                  <div className='flex items-center gap-1 bg-white/10 backdrop-blur text-white text-xs font-semibold px-2.5 py-1 rounded-lg border border-white/20'>
+                    Manage <ChevronRight size={11} />
                   </div>
                 </div>
               </div>
 
               <div className='p-4'>
-                <h3 className='font-bold text-slate-900 text-sm line-clamp-2 mb-3 group-hover:text-emerald-700 transition-colors'>
+                <h3 className='font-semibold text-white text-sm line-clamp-2 mb-3 group-hover:text-indigo-300 transition-colors'>
                   {item.title}
                 </h3>
 
-                <div className='flex items-center justify-between text-xs text-slate-500 mb-3'>
-                  <span className='flex items-center gap-1'>
-                    <Layers size={12} />
+                <div className='flex items-center justify-between text-xs text-zinc-600 mb-3'>
+                  <span className='flex items-center gap-1.5'>
+                    <Layers size={11} />
                     {item.modules?.length || 0} modules
                   </span>
-                  <span className='flex items-center gap-1'>
-                    <Users size={12} />
-                    —
-                  </span>
+                  <span className='text-xs text-zinc-700 bg-zinc-800 px-2 py-0.5 rounded-lg font-medium border border-white/5'>Active</span>
                 </div>
 
-                <div className='flex items-center justify-between pt-3 border-t border-slate-100'>
-                  <span className='text-base font-black text-emerald-600'>₹{item.amount}</span>
-                  <span className='text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-medium'>Active</span>
+                <div className='flex items-center justify-between pt-3 border-t border-white/5'>
+                  <span className='text-sm font-black text-indigo-400'>₹{item.amount?.toLocaleString('en-IN')}</span>
                 </div>
               </div>
             </div>

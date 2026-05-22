@@ -1,112 +1,113 @@
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useLoggedOut } from '@/hooks/User.hook'
 import { Spinner } from './ui/spinner'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useUserStore } from '@/Store/user.store'
-import { LogOut, User, LayoutDashboard, BookOpen } from 'lucide-react'
+import { LogOut, User, LayoutDashboard, BookOpen, GraduationCap, ChevronDown } from 'lucide-react'
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { mutate, isPending } = useLoggedOut()
   const { user } = useUserStore()
 
-  const navItems = [
-    // Only show Dashboard link to admin users
+  const navLinks = [
+    { label: 'Browse', href: '/' },
+    { label: 'My Learning', href: '/YourCourse' },
+  ]
+
+  const menuItems = [
     ...(user?.admin ? [{
       label: 'Dashboard',
       icon: LayoutDashboard,
       onClick: () => navigate('/dashboard')
     }] : []),
-    {
-      label: 'Profile',
-      icon: User,
-      onClick: () => navigate('/profile')
-    },
-    {
-      label: 'Your Courses',
-      icon: BookOpen,
-      onClick: () => navigate('/YourCourse')
-    },
-    {
-      label: 'Logout',
-      icon: LogOut,
-      onClick: () => mutate(),
-      loading: isPending
-    }
+    { label: 'Profile', icon: User, onClick: () => navigate('/profile') },
+    { label: 'My Courses', icon: BookOpen, onClick: () => navigate('/YourCourse') },
+    { label: 'Logout', icon: LogOut, onClick: () => mutate(), loading: isPending },
   ]
 
+  const isActive = (href) => location.pathname === href
+
   return (
-    <div className='h-[12vh] w-full flex items-center justify-between px-6 lg:px-9 shadow-lg bg-white/80 backdrop-blur-sm border-b border-slate-100'>
-      <div className='flex items-center gap-3'>
-        <h1 className='text-2xl lg:text-3xl font-black bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 bg-clip-text text-transparent tracking-tight'>
-          EduSmart
-        </h1>
+    <nav className='h-14 w-full flex items-center justify-between px-6 lg:px-10
+      bg-zinc-950/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50'>
+
+      {/* Left: Brand */}
+      <Link to='/' className='flex items-center gap-2 flex-shrink-0'>
+        <div className='w-7 h-7 bg-indigo-500 rounded-lg flex items-center justify-center'>
+          <GraduationCap className='w-4 h-4 text-white' />
+        </div>
+        <span className='text-[15px] font-bold text-white tracking-tight'>EduSmart</span>
+      </Link>
+
+      {/* Center: Nav links */}
+      <div className='hidden md:flex items-center gap-1'>
+        {navLinks.map((link) => (
+          <Link
+            key={link.href}
+            to={link.href}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+              ${isActive(link.href)
+                ? 'text-white bg-white/8'
+                : 'text-zinc-400 hover:text-white hover:bg-white/5'}`}
+          >
+            {link.label}
+          </Link>
+        ))}
       </div>
 
+      {/* Right: Avatar menu */}
       <Popover>
-        <PopoverTrigger className='flex items-center gap-3 p-2 hover:bg-slate-100 rounded-xl transition-all duration-200 group cursor-pointer'>
-          <Avatar className='w-10 h-10 ring-2 ring-slate-200 group-hover:ring-slate-300 transition-all'>
-            <AvatarImage
-              src={user?.profilePhoto || "https://github.com/shadcn.png"}
-              className='object-cover'
-            />
-            <AvatarFallback className='bg-gradient-to-br from-slate-200 to-slate-300 text-slate-700 font-semibold text-sm'>
-              {user?.fullName ? user.fullName.slice(0, 2).toUpperCase() : 'CN'}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className='hidden md:block text-left'>
-            <p className='font-semibold text-sm text-slate-900 leading-tight'>
-              {user?.fullName || 'User'}
-            </p>
-            <p className='text-xs text-slate-500 font-medium tracking-wide'>
-              {user?.admin ? 'Admin' : user?.email?.split('@')[0] || 'Member'}
-            </p>
-          </div>
-
-          <svg className='w-4 h-4 text-slate-400 ml-1 group-hover:text-slate-600 transition-colors' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
-          </svg>
+        <PopoverTrigger asChild>
+          <button className='flex items-center gap-2 px-2 py-1.5 rounded-xl
+            hover:bg-white/5 transition-all duration-150 group'>
+            <Avatar className='w-8 h-8 ring-1 ring-white/10'>
+              <AvatarImage src={user?.profilePhoto} className='object-cover' />
+              <AvatarFallback className='bg-indigo-500/20 text-indigo-300 text-xs font-bold'>
+                {user?.fullName ? user.fullName.slice(0, 2).toUpperCase() : 'ES'}
+              </AvatarFallback>
+            </Avatar>
+            <div className='hidden md:block text-left'>
+              <p className='text-sm font-semibold text-white leading-none'>
+                {user?.fullName?.split(' ')[0] || 'User'}
+              </p>
+            </div>
+            <ChevronDown className='w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors' />
+          </button>
         </PopoverTrigger>
 
-        <PopoverContent className='w-64 p-1 mt-2 border-slate-200 shadow-2xl rounded-2xl'>
-          <div className='p-4 border-b border-slate-100'>
-            <p className='font-semibold text-slate-900 text-sm tracking-tight'>
-              {user?.fullName || 'Welcome back'}
-            </p>
-            <p className='text-xs text-slate-500 font-medium'>
-              {user?.admin ? 'Administrator' : 'Student Account'}
-            </p>
+        <PopoverContent
+          className='w-56 p-1.5 mt-1 bg-zinc-900 border border-white/8 shadow-2xl shadow-black/50 rounded-2xl'
+          align='end'
+        >
+          <div className='px-3 py-2.5 mb-1 border-b border-white/5'>
+            <p className='text-sm font-semibold text-white truncate'>{user?.fullName || 'Welcome'}</p>
+            <p className='text-xs text-zinc-500 mt-0.5'>{user?.admin ? 'Administrator' : 'Student'}</p>
           </div>
 
-          <div className='py-2 space-y-1'>
-            {navItems.map((item, index) => (
+          <div className='space-y-0.5 py-1'>
+            {menuItems.map((item, i) => (
               <button
-                key={index}
+                key={i}
                 onClick={item.onClick}
                 disabled={item.loading}
-                className='group relative w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 hover:bg-slate-50 hover:shadow-md text-sm font-medium text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                className='w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
+                  text-zinc-300 hover:text-white hover:bg-white/5
+                  transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed
+                  font-medium relative'
               >
-                <item.icon className='w-4 h-4 text-slate-500 group-hover:text-slate-700 flex-shrink-0' />
-                <span className='truncate'>{item.label}</span>
-
-                {item.loading && (
-                  <div className='absolute right-4'>
-                    <Spinner size='sm' />
-                  </div>
-                )}
+                <item.icon className='w-4 h-4 text-zinc-500 flex-shrink-0' />
+                <span>{item.label}</span>
+                {item.loading && <Spinner size='sm' className='absolute right-3' />}
               </button>
             ))}
           </div>
         </PopoverContent>
       </Popover>
-    </div>
+    </nav>
   )
 }
 
